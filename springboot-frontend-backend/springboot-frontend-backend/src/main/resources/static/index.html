@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Product Management</h1>
+
+<div class="form-container">
+    <input type="text" id="name" placeholder="Product Name">
+    <input type="number" id="price" placeholder="Price">
+    <button onclick="addProduct()">Add Product</button>
+</div>
+
+<h2>Product List</h2>
+<ul id="productList"></ul>
+
+<script>
+    const apiUrl = 'http://localhost:8080/api/product';
+
+    function addProduct() {
+        const name = document.getElementById('name').value;
+        const price = parseFloat(document.getElementById('price').value);
+
+        if (!name || !price) {
+            alert("Please fill all fields!");
+            return;
+        }
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, price })
+        })
+        .then(res => res.json())
+        .then(() => {
+            alert('Product added!');
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            loadProducts();
+        });
+    }
+
+    function loadProducts() {
+        fetch(apiUrl)
+            .then(res => res.json())
+            .then(products => {
+                const list = document.getElementById('productList');
+                list.innerHTML = '';
+                products.forEach(p => {
+                    const li = document.createElement('li');
+                    li.textContent = `${p.id} - ${p.name} - ₹${p.price}`;
+                    list.appendChild(li);
+                });
+            });
+    }
+
+    window.onload = loadProducts;
+</script>
+
+
+</body>
+</html>
